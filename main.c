@@ -21,6 +21,9 @@ Public License along with HuffmanArchiver. If not, see
 #include <string.h>
 #include <unistd.h>
 
+#include "compress.h"
+#include "extract.h"
+
 int main (int argc, char * argv[])
 {
     bool Compressing, HelpShowing = false;
@@ -71,13 +74,11 @@ int main (int argc, char * argv[])
             {
                 if (Compressing)
                 {
-                    printf ("%s will compress %s into %s.\n",
-                            argv [0], argv [1], argv [3]);
+                    compress (argv [1], argv [3]);
                 }
                 else
                 {
-                    printf ("%s will extract %s into %s.\n",
-                            argv [0], argv [1], argv [3]);
+                    extract (argv [1], argv [3]);
                 }
             }
         }
