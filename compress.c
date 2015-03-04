@@ -18,7 +18,16 @@ Public License along with HuffmanArchiver. If not, see
 
 #include <stdio.h>
 
-void compress(char InputFile[], char OutFile[])
+void compress (char InputFileName [], char OutputFileName [])
 {
-    printf ("%s will be compressed into %s.\n", InputFile, OutFile);
+    printf ("%s will be compressed into %s.\n", InputFileName, OutputFileName);
+    FILE *InputFile;
+    InputFile = fopen (InputFileName, "r");
+    for ( int TempChar = getc (InputFile);
+          TempChar != EOF;
+          TempChar = getc (InputFile) )
+    {
+        printf ("%c", TempChar);
+    }
+    fclose (InputFile);
 }

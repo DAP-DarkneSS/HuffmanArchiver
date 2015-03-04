@@ -18,7 +18,7 @@ Public License along with HuffmanArchiver. If not, see
 
 #include <stdio.h>
 
-void extract(char InputFile[], char OutFile[])
+void extract (char InputFileName [], char OutFileName [])
 {
-    printf ("%s will be extracted into %s.\n", InputFile, OutFile);
+    printf ("%s will be extracted into %s.\n", InputFileName, OutFileName);
 }

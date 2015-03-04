@@ -16,4 +16,4 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 # <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-void extract(char InputFile[], char OutFile[]); // Huffman extractor.
+void extract (char InputFileName [], char OutFileName []); // Huffman extractor.
