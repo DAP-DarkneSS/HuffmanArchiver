@@ -5,10 +5,10 @@ DONE
    3 input file isn't accessible;
  * compressing
    + the first input file pass;
+   + chars occurrence statistic;
 
 TODO
  * compressing
-   - chars occurrence statistic;
    - Huffman tree raising;
    - encoding;
    - the second input file pass;

@@ -14,7 +14,7 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
-# <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
+<http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
 #include <stdio.h>
 
