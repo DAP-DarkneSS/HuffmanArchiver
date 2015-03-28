@@ -20,22 +20,47 @@ Public License along with HuffmanArchiver. If not, see
 #include <stdio.h>
 #include <stdlib.h>
 
-void compress (char InputFileName [], char OutputFileName [])
+struct SymbolWeightStruct
+{
+    int Symbol;
+    unsigned int Weight;
+    int LeftBranchIndex;
+    int RightBranchIndex;
+    int ParentIndex;
+};
+
+int whereIsParentless
+(
+    struct SymbolWeightStruct *SymbolWeightPtr,
+    int MinIndex,
+    int MaxIndex
+)
+{
+    int ParentlessIndex = -1;
+    for (int i = MinIndex; (i < MaxIndex) && (ParentlessIndex == -1); i++)
+    {
+        if (SymbolWeightPtr [i].ParentIndex == -1)
+        {
+            ParentlessIndex = i;
+        }
+    }
+    return (ParentlessIndex);
+}
+
+void compress (char InputFileName[], char OutputFileName[])
 {
     printf ("%s will be compressed into %s.\n", InputFileName, OutputFileName);
-    struct SymbolWeightStruct
-    {
-        int Symbol;
-        int Weight;
-    };
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
-    int SymbolWeightCount = 0;
+    unsigned int SymbolWeightCount = 0;
     const int SymbolWeightSingleSize = sizeof (struct SymbolWeightStruct);
     FILE *InputFile;
     int TempChar = EOF;
-    InputFile = fopen (InputFileName, "r");
     bool UnKnownSymbol;
+    unsigned int MinIndex1 = 0;
+    unsigned int MinIndex2 = 0;
+    int MinIndexCandidate = -1;
 
+    InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc (InputFile)) != EOF)
     {
         UnKnownSymbol = true;
@@ -49,18 +74,86 @@ void compress (char InputFileName [], char OutputFileName [])
         }
         if (UnKnownSymbol)
         {
-            SymbolWeightPtr = realloc(SymbolWeightPtr,
-                                      ((SymbolWeightCount + 1) *
-                                      SymbolWeightSingleSize));
-            SymbolWeightPtr [SymbolWeightCount].Symbol = TempChar;
-            SymbolWeightPtr [SymbolWeightCount].Weight = 1;
+            SymbolWeightPtr = realloc
+            (
+                SymbolWeightPtr,
+                (
+                    (SymbolWeightCount + 1) * SymbolWeightSingleSize
+                )
+            );
+            SymbolWeightPtr [SymbolWeightCount].Symbol           = TempChar;
+            SymbolWeightPtr [SymbolWeightCount].Weight           = 1;
+            SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
+            SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
+            SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
             SymbolWeightCount++;
         }
     }
+    fclose (InputFile);
+
+    while
+    (
+        ((MinIndexCandidate =
+        whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount))
+        != (SymbolWeightCount - 1)) && (MinIndexCandidate != -1)
+    )
+    {
+        MinIndex1 = MinIndexCandidate;
+        MinIndex2 = whereIsParentless
+                    (SymbolWeightPtr, (MinIndex1 + 1), SymbolWeightCount);
+        for
+        (
+            MinIndexCandidate = whereIsParentless
+            (
+                SymbolWeightPtr, (MinIndex2 + 1), SymbolWeightCount
+            );
+            MinIndexCandidate != -1;
+            MinIndexCandidate = whereIsParentless
+            (
+                SymbolWeightPtr, (MinIndexCandidate + 1), SymbolWeightCount
+            )
+        )
+        {
+            if
+            (
+                SymbolWeightPtr [MinIndexCandidate].Weight <
+                SymbolWeightPtr [MinIndex2].Weight
+            )
+            {
+                MinIndex2 = MinIndexCandidate;
+            }
+            else if
+            (
+                SymbolWeightPtr [MinIndexCandidate].Weight <
+                SymbolWeightPtr [MinIndex1].Weight
+            )
+            {
+                MinIndex1 = MinIndex2;
+                MinIndex2 = MinIndexCandidate;
+            }
+        }
+        SymbolWeightPtr = realloc
+        (
+            SymbolWeightPtr,
+            (
+                (SymbolWeightCount + 1) * SymbolWeightSingleSize
+            )
+        );
+        SymbolWeightPtr [SymbolWeightCount].Symbol           = -1;
+        SymbolWeightPtr [SymbolWeightCount].Weight           =
+            SymbolWeightPtr [MinIndex1].Weight +
+            SymbolWeightPtr [MinIndex2].Weight;
+        SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = MinIndex1;
+        SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex2;
+        SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+        SymbolWeightPtr [MinIndex1].ParentIndex =
+        SymbolWeightPtr [MinIndex2].ParentIndex = SymbolWeightCount;
+        SymbolWeightCount++;
+    }
+
     for (int i = 0; i < SymbolWeightCount; i++)
     {
-        printf("%c - %i\n", SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Weight);
+        printf("#%i:\t%c - %i by #%i\n", i, SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Weight, SymbolWeightPtr [i].ParentIndex);
     }
-    fclose (InputFile);
     free (SymbolWeightPtr);
 }

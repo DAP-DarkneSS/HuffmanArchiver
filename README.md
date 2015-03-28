@@ -6,10 +6,10 @@ DONE
  * compressing
    + the first input file pass;
    + chars occurrence statistic;
+   + Huffman tree raising;
 
 TODO
  * compressing
-   - Huffman tree raising;
    - encoding;
    - the second input file pass;
    - output file writing;
