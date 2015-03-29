@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
-project(huff C)
+project(huffar C)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -Wall -std=c99")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -std=c99")
 
-add_executable(huff extract.c compress.c main.c)
+add_executable(huffar extract.c compress.c main.c)
 
-install(TARGETS huff RUNTIME DESTINATION bin)
+install(TARGETS huffar DESTINATION ${CMAKE_INSTALL_PREFIX}/bin COMPONENT binaries)

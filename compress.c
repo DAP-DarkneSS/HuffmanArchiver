@@ -27,6 +27,7 @@ struct SymbolWeightStruct
     int LeftBranchIndex;
     int RightBranchIndex;
     int ParentIndex;
+    unsigned int Code;
 };
 
 int whereIsParentless
@@ -64,7 +65,7 @@ void compress (char InputFileName[], char OutputFileName[])
     while ((TempChar = getc (InputFile)) != EOF)
     {
         UnKnownSymbol = true;
-        for (int i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
+        for (unsigned int i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
         {
             if (SymbolWeightPtr [i].Symbol == TempChar)
             {
@@ -86,6 +87,7 @@ void compress (char InputFileName[], char OutputFileName[])
             SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
             SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
             SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+            SymbolWeightPtr [SymbolWeightCount].Code             = 0;
             SymbolWeightCount++;
         }
     }
@@ -146,14 +148,33 @@ void compress (char InputFileName[], char OutputFileName[])
         SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = MinIndex1;
         SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex2;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+        SymbolWeightPtr [SymbolWeightCount].Code             = 0;
         SymbolWeightPtr [MinIndex1].ParentIndex =
         SymbolWeightPtr [MinIndex2].ParentIndex = SymbolWeightCount;
         SymbolWeightCount++;
     }
 
-    for (int i = 0; i < SymbolWeightCount; i++)
+    for (int i = SymbolWeightCount - 2; i >= 0; i--)
     {
-        printf("#%i:\t%c - %i by #%i\n", i, SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Weight, SymbolWeightPtr [i].ParentIndex);
+        if (i == SymbolWeightPtr [
+                SymbolWeightPtr [i].ParentIndex
+            ].LeftBranchIndex)
+        {
+            SymbolWeightPtr [i].Code = (SymbolWeightPtr [
+                SymbolWeightPtr [i].ParentIndex
+            ].Code << 1) + 0;
+        }
+        else
+        {
+            SymbolWeightPtr [i].Code = (SymbolWeightPtr [
+                SymbolWeightPtr [i].ParentIndex
+            ].Code << 1) + 1;
+        }
+    }
+
+    for (unsigned int i = 0; (i < SymbolWeightCount) && (SymbolWeightPtr [i].LeftBranchIndex == -1); i++)
+    {
+        printf("%c = %i\n", SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Code);
     }
     free (SymbolWeightPtr);
 }

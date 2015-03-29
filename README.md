@@ -7,10 +7,10 @@ DONE
    + the first input file pass;
    + chars occurrence statistic;
    + Huffman tree raising;
+   + encoding;
 
 TODO
  * compressing
-   - encoding;
    - the second input file pass;
    - output file writing;
  * Makefile
