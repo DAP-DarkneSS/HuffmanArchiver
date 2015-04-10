@@ -24,7 +24,7 @@ Public License along with HuffmanArchiver. If not, see
 void compress (char InputFileName[], char OutputFileName[])
 {
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
-    unsigned int SymbolWeightCount = 0;
+    size_t SymbolWeightCount = 0;
     FILE *InputFile;
     int TempChar = EOF;
     bool UnKnownSymbol = true;
@@ -33,7 +33,7 @@ void compress (char InputFileName[], char OutputFileName[])
     while ((TempChar = getc (InputFile)) != EOF)
     {
         UnKnownSymbol = true;
-        for (unsigned int i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
+        for (size_t i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
         {
             if (SymbolWeightPtr [i].Symbol == TempChar)
             {
@@ -62,7 +62,7 @@ void compress (char InputFileName[], char OutputFileName[])
 
     SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
 
-    for (unsigned int i = 0; (i < SymbolWeightCount) && (SymbolWeightPtr [i].LeftBranchIndex == -1); i++)
+    for (size_t i = 0; (i < SymbolWeightCount) && (SymbolWeightPtr [i].LeftBranchIndex == -1); i++)
     {
         printf("%c = %i\n", SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Code);
     }

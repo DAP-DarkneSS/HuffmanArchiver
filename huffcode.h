@@ -18,20 +18,20 @@ Public License along with HuffmanArchiver. If not, see
 
 struct SymbolWeightStruct
 {
-    int Symbol;
+             int Symbol;
     unsigned int Weight;
-    int LeftBranchIndex;
-    int RightBranchIndex;
-    int ParentIndex;
+             int LeftBranchIndex;
+             int RightBranchIndex;
+             int ParentIndex;
     unsigned int Code;
-    size_t CodeBitsCount;
+    unsigned int CodeBitsCount;
 }; /// Core struct for this implementation.
 
 static const int SymbolWeightSingleSize =
     sizeof (struct SymbolWeightStruct); /// Core struct size.
 
-unsigned int makeHuffman
+size_t makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    unsigned int SymbolWeightCount
+    size_t SymbolWeightCount
 ); /// Huffman coding.

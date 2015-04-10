@@ -37,14 +37,14 @@ int whereIsParentless
     return (ParentlessIndex);
 }
 
-unsigned int makeHuffman
+size_t makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    unsigned int SymbolWeightCount
+    size_t SymbolWeightCount
 )
 {
-    unsigned int MinIndex1 = 0;
-    unsigned int MinIndex2 = 0;
+    size_t MinIndex1 = 0;
+    size_t MinIndex2 = 0;
     int MinIndexCandidate = -1;
 
     while
