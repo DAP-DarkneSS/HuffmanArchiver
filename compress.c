@@ -55,7 +55,6 @@ void compress (char InputFileName[], char OutputFileName[])
             SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
             SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
             SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
-            SymbolWeightPtr [SymbolWeightCount].Code             = 0;
             SymbolWeightCount++;
         }
     }

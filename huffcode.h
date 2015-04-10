@@ -24,6 +24,7 @@ struct SymbolWeightStruct
     int RightBranchIndex;
     int ParentIndex;
     unsigned int Code;
+    size_t CodeBitsCount;
 }; /// Core struct for this implementation.
 
 static const int SymbolWeightSingleSize =

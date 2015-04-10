@@ -103,6 +103,7 @@ unsigned int makeHuffman
         SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex2;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
         SymbolWeightPtr [SymbolWeightCount].Code             = 0;
+        SymbolWeightPtr [SymbolWeightCount].CodeBitsCount    = 0;
         SymbolWeightPtr [MinIndex1].ParentIndex =
         SymbolWeightPtr [MinIndex2].ParentIndex = SymbolWeightCount;
         SymbolWeightCount++;
@@ -124,6 +125,9 @@ unsigned int makeHuffman
                 SymbolWeightPtr [i].ParentIndex
             ].Code << 1) + 1;
         }
+        SymbolWeightPtr [i].CodeBitsCount = SymbolWeightPtr [
+                SymbolWeightPtr [i].ParentIndex
+            ].CodeBitsCount + 1;
     }
 
     return (SymbolWeightCount);
