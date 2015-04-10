@@ -7,14 +7,13 @@ DONE
    + the first input file pass;
    + chars occurrence statistic;
    + the second input file pass;
+   - output file writing: content;
  * Huffman coding
+   + Huffman tree raising;
    + encoding;
 
 BUGZONE
- * Huffman coding
-   + Huffman tree raising;
- * compressing
-   - output file writing: content;
+ * 
 
 TODO
  * compressing

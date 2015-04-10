@@ -16,7 +16,7 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-#include <stdlib.h>
+#include <stddef.h> // error: unknown type name ‘size_t’
 #include "huffcode.h"
 
 int whereIsParentless
@@ -88,13 +88,6 @@ size_t makeHuffman
                 MinIndex2 = MinIndexCandidate;
             }
         }
-        SymbolWeightPtr = realloc
-        (
-            SymbolWeightPtr,
-            (
-                (SymbolWeightCount + 1) * SymbolWeightSingleSize
-            )
-        );
         SymbolWeightPtr [SymbolWeightCount].Symbol           = -1;
         SymbolWeightPtr [SymbolWeightCount].Weight           =
             SymbolWeightPtr [MinIndex1].Weight +

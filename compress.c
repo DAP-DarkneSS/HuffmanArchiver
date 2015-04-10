@@ -67,11 +67,17 @@ void compress (char InputFileName[], char OutputFileName[])
     }
     fclose (InputFile);
 
+    SymbolWeightPtr = realloc
+    (
+        SymbolWeightPtr,
+        (SymbolWeightCount * 2 * SymbolWeightSingleSize)
+    );
+    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
+
     OutputFile = fopen (OutputFileName, "w");
 // TODO Put coding header ^
 
     InputFile = fopen (InputFileName, "r");
-    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
     while ((TempChar = getc (InputFile)) != EOF)
     {
         for
