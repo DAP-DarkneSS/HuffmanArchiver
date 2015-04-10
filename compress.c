@@ -26,8 +26,15 @@ void compress (char InputFileName[], char OutputFileName[])
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
     size_t SymbolWeightCount = 0;
     FILE *InputFile;
+    FILE *OutputFile;
     int TempChar = EOF;
     bool UnKnownSymbol = true;
+    const int ByteBits = 8 * sizeof (char);
+    int BitsDataCount = 0;
+    unsigned long int BitsStream = 0;
+    int OutputByte = 0;
+    int BitsStreamCount = 0;
+    size_t SymbolWeightIndex = 0;
 
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc (InputFile)) != EOF)
@@ -60,11 +67,39 @@ void compress (char InputFileName[], char OutputFileName[])
     }
     fclose (InputFile);
 
-    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
+    OutputFile = fopen (OutputFileName, "w");
+// TODO Put coding header ^
 
-    for (size_t i = 0; (i < SymbolWeightCount) && (SymbolWeightPtr [i].LeftBranchIndex == -1); i++)
+    InputFile = fopen (InputFileName, "r");
+    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
+    while ((TempChar = getc (InputFile)) != EOF)
     {
-        printf("%c = %i\n", SymbolWeightPtr [i].Symbol, SymbolWeightPtr [i].Code);
+        for
+            (
+                SymbolWeightIndex = 0;
+                (
+                    (SymbolWeightIndex < SymbolWeightCount) &&
+                    (SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar)
+                );
+                SymbolWeightIndex++
+            ){}
+        BitsDataCount = SymbolWeightPtr [SymbolWeightIndex].CodeBitsCount;
+        BitsStream = (BitsStream << BitsDataCount) +
+                     SymbolWeightPtr [SymbolWeightIndex].Code;
+        BitsStreamCount += BitsDataCount;
+        while (BitsStreamCount >= ByteBits)
+        {
+            OutputByte = BitsStream >> (BitsStreamCount - ByteBits);
+            BitsStream -= ((unsigned long int) OutputByte) <<
+                          (BitsStreamCount - ByteBits);
+            BitsStreamCount -= ByteBits;
+            putc (OutputByte, OutputFile);
+        }
     }
+    fclose (InputFile);
+    OutputByte = BitsStream << (ByteBits - BitsStreamCount);
+    putc (OutputByte, OutputFile);
+    fclose (OutputFile);
+
     free (SymbolWeightPtr);
 }
