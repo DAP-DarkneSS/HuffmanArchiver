@@ -8,18 +8,18 @@ DONE
    + chars occurrence statistic;
    + the second input file pass;
    + output file writing: header;
-   + output file writing: content;
  * Huffman coding
    + Huffman tree raising;
    + encoding;
  * extracting
    + input file reading: header;
+   + output file writing;
 
 BUGZONE
- * 
+ * compressing
+   . output file writing: content;
+ * extracting
+   . input file reading: content;
 
 TODO
- * extracting
-   - input file reading: content;
-   - output file writing;
  * Makefile

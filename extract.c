@@ -26,8 +26,11 @@ void extract (char InputFileName[], char OutputFileName[])
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
     size_t SymbolWeightCount = 0;
     FILE *InputFile;
+    FILE *OutputFile;
     int TempChar = EOF;
+    size_t SymbolWeightIndex = 0;
     size_t MaxWeightBits = 0;
+    int TempBit = 0;
 
     InputFile = fopen (InputFileName, "r");
     MaxWeightBits = getc (InputFile);
@@ -48,7 +51,7 @@ void extract (char InputFileName[], char OutputFileName[])
         SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
         SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
-        for (size_t i = 1; i < MaxWeightBits; i += CHAR_BIT)
+        for (size_t i = CHAR_BIT; i < MaxWeightBits; i += CHAR_BIT)
         {
             TempChar = getc (InputFile); // The next weight byte.
             SymbolWeightPtr [SymbolWeightCount].Weight     <<= CHAR_BIT;
@@ -66,6 +69,37 @@ void extract (char InputFileName[], char OutputFileName[])
     );
     SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
 
-   fclose (InputFile);
+    SymbolWeightIndex = SymbolWeightCount - 1;
+    OutputFile = fopen (OutputFileName, "w");
+    while ((TempChar = getc (InputFile)) != EOF) // Bit stream bytes.
+    {
+        for (int i = (CHAR_BIT - 1); i >= 0; i--)
+        {
+            TempBit = TempChar >> i;
+            TempChar -= (TempBit >> i);
+            if (TempBit == 0)
+            {
+                SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                    .LeftBranchIndex;
+            }
+            else
+            {
+                SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                    .RightBranchIndex;
+            }
+            if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+            {
+                putc
+                (
+                    SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                    OutputFile
+                );
+                SymbolWeightIndex = SymbolWeightCount - 1;
+            }
+        }
+    }
+
+    fclose (OutputFile);
+    fclose (InputFile);
     free (SymbolWeightPtr);
 }
