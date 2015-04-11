@@ -33,9 +33,9 @@ void extract (char InputFileName[], char OutputFileName[])
     int TempBit = 0;
 
     InputFile = fopen (InputFileName, "r");
-    MaxWeightBits = getc (InputFile);
+    MaxWeightBits = getc_unlocked (InputFile);
 
-    TempChar = getc (InputFile); // The first unique symbol.
+    TempChar = getc_unlocked (InputFile); // The first unique symbol.
     do
     {
         SymbolWeightPtr = realloc
@@ -46,19 +46,19 @@ void extract (char InputFileName[], char OutputFileName[])
             )
         );
         SymbolWeightPtr [SymbolWeightCount].Symbol           = TempChar;
-        TempChar = getc (InputFile); // The first weight byte.
+        TempChar = getc_unlocked (InputFile); // The first weight byte.
         SymbolWeightPtr [SymbolWeightCount].Weight           = TempChar;
         SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
         SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
         for (size_t i = CHAR_BIT; i < MaxWeightBits; i += CHAR_BIT)
         {
-            TempChar = getc (InputFile); // The next weight byte.
+            TempChar = getc_unlocked (InputFile); // The next weight byte.
             SymbolWeightPtr [SymbolWeightCount].Weight     <<= CHAR_BIT;
             SymbolWeightPtr [SymbolWeightCount].Weight      += TempChar;
         }
         SymbolWeightCount++;
-        TempChar = getc (InputFile); // The next symbol.
+        TempChar = getc_unlocked (InputFile); // The next symbol.
     }
     while (TempChar != SymbolWeightPtr [SymbolWeightCount - 1].Symbol);
 
@@ -71,7 +71,7 @@ void extract (char InputFileName[], char OutputFileName[])
 
     SymbolWeightIndex = SymbolWeightCount - 1;
     OutputFile = fopen (OutputFileName, "w");
-    while ((TempChar = getc (InputFile)) != EOF) // Bit stream bytes.
+    while ((TempChar = getc_unlocked (InputFile)) != EOF) // Bit stream bytes.
     {
         for (int i = (CHAR_BIT - 1); i >= 0; i--)
         {
@@ -89,7 +89,7 @@ void extract (char InputFileName[], char OutputFileName[])
             }
             if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
             {
-                putc
+                putc_unlocked
                 (
                     SymbolWeightPtr [SymbolWeightIndex].Symbol,
                     OutputFile

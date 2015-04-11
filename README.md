@@ -21,5 +21,12 @@ BUGZONE
  * extracting
    . input file reading: content;
 
+NEEDOPTIMIZATION
+ * compressing
+   . 048: if (SymbolWeightPtr [i].Symbol == TempChar)
+   . 138: SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar;
+ * extracting
+   . 090: if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+
 TODO
  * Makefile

@@ -40,7 +40,7 @@ void compress (char InputFileName[], char OutputFileName[])
     size_t TempWeight = 0;
 
     InputFile = fopen (InputFileName, "r");
-    while ((TempChar = getc (InputFile)) != EOF)
+    while ((TempChar = getc_unlocked (InputFile)) != EOF)
     {
         UnKnownSymbol = true;
         for (size_t i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
@@ -103,7 +103,7 @@ void compress (char InputFileName[], char OutputFileName[])
     }
     MaxWeightBits *= CHAR_BIT;
     OutputFile = fopen (OutputFileName, "w");
-    putc (MaxWeightBits, OutputFile);
+    putc_unlocked (MaxWeightBits, OutputFile);
     for
     (
         SymbolWeightIndex = 0;
@@ -111,7 +111,7 @@ void compress (char InputFileName[], char OutputFileName[])
         SymbolWeightIndex++
     )
     {
-        putc (SymbolWeightPtr [SymbolWeightIndex].Symbol, OutputFile);
+        putc_unlocked (SymbolWeightPtr [SymbolWeightIndex].Symbol, OutputFile);
         TempWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
         for
         (
@@ -121,16 +121,16 @@ void compress (char InputFileName[], char OutputFileName[])
         )
         {
             OutputByte = TempWeight >> j;
-            putc (OutputByte, OutputFile);
+            putc_unlocked (OutputByte, OutputFile);
             TempWeight -= (OutputByte << j);
         }
-        putc (TempWeight, OutputFile);
+        putc_unlocked (TempWeight, OutputFile);
     }
-    putc (SymbolWeightPtr [SymbolWeightIndex - 1].Symbol, OutputFile);
+    putc_unlocked (SymbolWeightPtr [SymbolWeightIndex - 1].Symbol, OutputFile);
 // A HACK to mark the end of characters occurrence statistic ^
 
     InputFile = fopen (InputFileName, "r");
-    while ((TempChar = getc (InputFile)) != EOF)
+    while ((TempChar = getc_unlocked (InputFile)) != EOF)
     {
         for
             (
@@ -148,12 +148,12 @@ void compress (char InputFileName[], char OutputFileName[])
             BitsStream -= ((unsigned long int) OutputByte) <<
                           (BitsStreamCount - CHAR_BIT);
             BitsStreamCount -= CHAR_BIT;
-            putc (OutputByte, OutputFile);
+            putc_unlocked (OutputByte, OutputFile);
         }
     }
     fclose (InputFile);
     OutputByte = BitsStream << (CHAR_BIT - BitsStreamCount);
-    putc (OutputByte, OutputFile);
+    putc_unlocked (OutputByte, OutputFile);
     fclose (OutputFile);
 
     free (SymbolWeightPtr);
