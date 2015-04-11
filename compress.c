@@ -16,6 +16,7 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
+#include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,7 +30,6 @@ void compress (char InputFileName[], char OutputFileName[])
     FILE *OutputFile;
     int TempChar = EOF;
     bool UnKnownSymbol = true;
-    const int ByteBits = 8 * sizeof (char);
     int BitsDataCount = 0;
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
@@ -93,17 +93,17 @@ void compress (char InputFileName[], char OutputFileName[])
         BitsStream = (BitsStream << BitsDataCount) +
                      SymbolWeightPtr [SymbolWeightIndex].Code;
         BitsStreamCount += BitsDataCount;
-        while (BitsStreamCount >= ByteBits)
+        while (BitsStreamCount >= CHAR_BIT)
         {
-            OutputByte = BitsStream >> (BitsStreamCount - ByteBits);
+            OutputByte = BitsStream >> (BitsStreamCount - CHAR_BIT);
             BitsStream -= ((unsigned long int) OutputByte) <<
-                          (BitsStreamCount - ByteBits);
-            BitsStreamCount -= ByteBits;
+                          (BitsStreamCount - CHAR_BIT);
+            BitsStreamCount -= CHAR_BIT;
             putc (OutputByte, OutputFile);
         }
     }
     fclose (InputFile);
-    OutputByte = BitsStream << (ByteBits - BitsStreamCount);
+    OutputByte = BitsStream << (CHAR_BIT - BitsStreamCount);
     putc (OutputByte, OutputFile);
     fclose (OutputFile);
 
