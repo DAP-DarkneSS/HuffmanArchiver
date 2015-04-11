@@ -12,15 +12,14 @@ DONE
  * Huffman coding
    + Huffman tree raising;
    + encoding;
+ * extracting
+   + input file reading: header;
 
 BUGZONE
  * 
 
 TODO
  * extracting
-   - input file reading: header;
-   - the first input file pass;
    - input file reading: content;
-   - the second input file pass;;
    - output file writing;
  * Makefile

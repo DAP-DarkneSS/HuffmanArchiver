@@ -16,9 +16,56 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
+#include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdio.h>
+#include <stdlib.h>
+#include "huffcode.h"
 
 void extract (char InputFileName[], char OutFileName[])
 {
-    printf ("%s will be extracted into %s.\n", InputFileName, OutFileName);
+    struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
+    size_t SymbolWeightCount = 0;
+    FILE *InputFile;
+    int TempChar = EOF;
+    size_t MaxWeightBits = 0;
+
+    InputFile = fopen (InputFileName, "r");
+    MaxWeightBits = getc (InputFile);
+
+    TempChar = getc (InputFile); // The first unique symbol.
+    do
+    {
+        SymbolWeightPtr = realloc
+        (
+            SymbolWeightPtr,
+            (
+                (SymbolWeightCount + 1) * SymbolWeightSingleSize
+            )
+        );
+        SymbolWeightPtr [SymbolWeightCount].Symbol           = TempChar;
+        TempChar = getc (InputFile); // The first weight byte.
+        SymbolWeightPtr [SymbolWeightCount].Weight           = TempChar;
+        SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
+        SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
+        SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+        for (size_t i = 1; i < MaxWeightBits; i += CHAR_BIT)
+        {
+            TempChar = getc (InputFile); // The next weight byte.
+            SymbolWeightPtr [SymbolWeightCount].Weight     <<= CHAR_BIT;
+            SymbolWeightPtr [SymbolWeightCount].Weight      += TempChar;
+        }
+        SymbolWeightCount++;
+        TempChar = getc (InputFile); // The next symbol.
+    }
+    while (TempChar != SymbolWeightPtr [SymbolWeightCount - 1].Symbol);
+
+    SymbolWeightPtr = realloc
+    (
+        SymbolWeightPtr,
+        (SymbolWeightCount * 2 * SymbolWeightSingleSize)
+    );
+    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
+
+    fclose (InputFile);
+    free (SymbolWeightPtr);
 }
