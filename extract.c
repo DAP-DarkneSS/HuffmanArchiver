@@ -21,7 +21,7 @@ Public License along with HuffmanArchiver. If not, see
 #include <stdlib.h>
 #include "huffcode.h"
 
-void extract (char InputFileName[], char OutFileName[])
+void extract (char InputFileName[], char OutputFileName[])
 {
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
     size_t SymbolWeightCount = 0;
@@ -66,6 +66,6 @@ void extract (char InputFileName[], char OutFileName[])
     );
     SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
 
-    fclose (InputFile);
+   fclose (InputFile);
     free (SymbolWeightPtr);
 }
