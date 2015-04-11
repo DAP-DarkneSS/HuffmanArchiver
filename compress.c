@@ -35,6 +35,9 @@ void compress (char InputFileName[], char OutputFileName[])
     int OutputByte = 0;
     int BitsStreamCount = 0;
     size_t SymbolWeightIndex = 0;
+    size_t MaxWeight = 0;
+    size_t MaxWeightBits = 0;
+    size_t TempWeight = 0;
 
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc (InputFile)) != EOF)
@@ -74,8 +77,57 @@ void compress (char InputFileName[], char OutputFileName[])
     );
     SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
 
+    for
+    (
+        SymbolWeightIndex = 0;
+        (
+            (SymbolWeightIndex < SymbolWeightCount) &&
+            (SymbolWeightPtr [SymbolWeightIndex].Symbol != -1)
+        );
+        SymbolWeightIndex++
+    )
+    {
+        if (SymbolWeightPtr [SymbolWeightIndex].Weight > MaxWeight)
+        {
+            MaxWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
+        }
+    }
+    for
+    (
+        MaxWeightBits = 0;
+        MaxWeight > 0;
+        MaxWeight >>= CHAR_BIT
+    )
+    {
+        MaxWeightBits++;
+    }
+    MaxWeightBits *= CHAR_BIT;
     OutputFile = fopen (OutputFileName, "w");
-// TODO Put coding header ^
+    putc (MaxWeightBits, OutputFile);
+    for
+    (
+        SymbolWeightIndex = 0;
+        SymbolWeightPtr [SymbolWeightIndex].Symbol != -1;
+        SymbolWeightIndex++
+    )
+    {
+        putc (SymbolWeightPtr [SymbolWeightIndex].Symbol, OutputFile);
+        TempWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
+        for
+        (
+            size_t j = (MaxWeightBits - CHAR_BIT);
+            j >= CHAR_BIT;
+            j -= CHAR_BIT
+        )
+        {
+            OutputByte = TempWeight >> j;
+            putc (OutputByte, OutputFile);
+            TempWeight -= (OutputByte << j);
+        }
+        putc (TempWeight, OutputFile);
+    }
+    putc (SymbolWeightPtr [SymbolWeightIndex - 1].Symbol, OutputFile);
+// A HACK to mark the end of characters occurrence statistic ^
 
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc (InputFile)) != EOF)
@@ -83,10 +135,7 @@ void compress (char InputFileName[], char OutputFileName[])
         for
             (
                 SymbolWeightIndex = 0;
-                (
-                    (SymbolWeightIndex < SymbolWeightCount) &&
-                    (SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar)
-                );
+                SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar;
                 SymbolWeightIndex++
             ){}
         BitsDataCount = SymbolWeightPtr [SymbolWeightIndex].CodeBitsCount;
