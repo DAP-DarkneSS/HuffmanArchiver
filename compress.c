@@ -41,7 +41,7 @@ void compress (char InputFileName[], char OutputFileName[])
     size_t MaxWeightBits = 0;
     size_t TempWeight = 0;
 
-    for (int i = 0; i < MaxSymbolsCount; i++)
+    for (size_t i = 0; i < MaxSymbolsCount; i++)
     {
         SymbolWeightPtr [i].Symbol           =  i;
         SymbolWeightPtr [i].Weight           =  0;
