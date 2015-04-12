@@ -15,18 +15,19 @@ DONE
    + input file reading: header;
    + output file writing;
 
+TUNEDUP
+ * compressing
+   + predefined symbols list;
+
 BUGZONE
  * compressing
-   . output file writing: content;
+   - output file writing: content;
  * extracting
-   . input file reading: content;
+   - input file reading: content;
 
 NEEDOPTIMIZATION
- * compressing
-   . 048: if (SymbolWeightPtr [i].Symbol == TempChar)
-   . 138: SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar;
  * extracting
-   . 090: if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+   - 093: if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
 
 TODO
  * Makefile

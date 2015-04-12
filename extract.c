@@ -31,7 +31,7 @@ void extract (char InputFileName[], char OutputFileName[])
     FILE *InputFile;
     FILE *OutputFile;
     int TempChar = EOF;
-    size_t SymbolWeightIndex = 0;
+    int SymbolWeightIndex = 0;
     size_t MaxWeightBits = 0;
     int TempBit = 0;
 
