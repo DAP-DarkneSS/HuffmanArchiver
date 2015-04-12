@@ -108,11 +108,15 @@ void extract (char InputFileName[], char OutputFileName[])
             }
             if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
             {
-                putc_unlocked
-                (
-                    SymbolWeightPtr [SymbolWeightIndex].Symbol,
-                    OutputFile
-                );
+                if (SymbolsCount > 0)
+                {
+                    putc_unlocked
+                    (
+                        SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                        OutputFile
+                    );
+                    SymbolsCount--;
+                }
                 SymbolWeightIndex = SymbolWeightCount - 1;
             }
         }

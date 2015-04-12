@@ -11,13 +11,21 @@ DONE
    + the first input file pass;
    + chars occurrence statistic;
    + the second input file pass;
-   + output file writing: header;
+   + output file writing, header:
+     * numbers bits count;
+     * symbols count;
+     * symbols occurrence statistic;
+     * end of statistic mark;
    + output file writing: content;
  * Huffman coding
    + Huffman tree raising;
    + encoding;
  * extracting
-   + input file reading: header;
+   + input file reading, header:
+     * numbers bits count;
+     * symbols count;
+     * symbols occurrence statistic;
+     * end of statistic mark;
    + input file reading: content;
    + output file writing;
 
@@ -26,10 +34,7 @@ TUNEDUP
    + predefined symbols list;
 
 BUGZONE
- * compressing
-   - output file writing: bitstream end;
- * extracting
-   - input file reading: bitstream end;
+ * 
 
 NEEDOPTIMIZATION
  * extracting
