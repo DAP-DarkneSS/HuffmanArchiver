@@ -24,6 +24,28 @@ Public License along with HuffmanArchiver. If not, see
 #include <stdlib.h>
 #include "huffcode.h"
 
+void writeInBytes
+(
+    unsigned int Number,
+    size_t BitsCount,
+    FILE *OutputFile
+)
+{
+    int OutputByte = 0;
+    for
+    (
+        size_t i = (BitsCount - CHAR_BIT);
+        i >= CHAR_BIT;
+        i -= CHAR_BIT
+    )
+    {
+        OutputByte = Number >> i;
+        putc_unlocked (OutputByte, OutputFile);
+        Number -= (OutputByte << i);
+    }
+    putc_unlocked (Number, OutputFile);
+}
+
 void compress (char InputFileName[], char OutputFileName[])
 {
     const int MaxSymbolsCount = 1 << CHAR_BIT;
@@ -38,9 +60,7 @@ void compress (char InputFileName[], char OutputFileName[])
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
     int BitsStreamCount = 0;
-    size_t MaxWeight = 0;
     size_t MaxWeightBits = 0;
-    size_t TempWeight = 0;
     int TheLastSymbolIndex = 0;
 
     for (int i = 0; i < MaxSymbolsCount; i++)
@@ -63,29 +83,13 @@ void compress (char InputFileName[], char OutputFileName[])
 
     for
     (
-        int i = 0;
-        (
-            (i < SymbolWeightCount) &&
-            (SymbolWeightPtr [i].Symbol != -1)
-        );
-        i++
+        size_t i = SymbolWeightPtr [SymbolWeightCount - 1].Weight;
+        i > 0;
+        i >>= CHAR_BIT
     )
     {
-        if (SymbolWeightPtr [i].Weight > MaxWeight)
-        {
-            MaxWeight = SymbolWeightPtr [i].Weight;
-        }
+        MaxWeightBits += CHAR_BIT;
     }
-    for
-    (
-        MaxWeightBits = 0;
-        MaxWeight > 0;
-        MaxWeight >>= CHAR_BIT
-    )
-    {
-        MaxWeightBits++;
-    }
-    MaxWeightBits *= CHAR_BIT;
     OutputFile = fopen (OutputFileName, "w");
     putc_unlocked (MaxWeightBits, OutputFile);
     for
@@ -101,19 +105,12 @@ void compress (char InputFileName[], char OutputFileName[])
             (
                 i, OutputFile
             );
-            TempWeight = SymbolWeightPtr [i].Weight;
-            for
+            writeInBytes
             (
-                size_t j = (MaxWeightBits - CHAR_BIT);
-                j >= CHAR_BIT;
-                j -= CHAR_BIT
-            )
-            {
-                OutputByte = TempWeight >> j;
-                putc_unlocked (OutputByte, OutputFile);
-                TempWeight -= (OutputByte << j);
-            }
-            putc_unlocked (TempWeight, OutputFile);
+                SymbolWeightPtr [i].Weight,
+                MaxWeightBits,
+                OutputFile
+            );
             TheLastSymbolIndex = i;
         }
     }

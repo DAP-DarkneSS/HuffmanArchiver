@@ -1,6 +1,7 @@
 [Building status](https://build.opensuse.org/project/show/home:DarkSS) (live master brach), check logs for clang static analyzer & valgrind memcheck output.
 
 Development status:
+
 DONE
  * command line arguments with exit code:
    + 1 ← arguments number is less than 3;
@@ -11,11 +12,13 @@ DONE
    + chars occurrence statistic;
    + the second input file pass;
    + output file writing: header;
+   + output file writing: content;
  * Huffman coding
    + Huffman tree raising;
    + encoding;
  * extracting
    + input file reading: header;
+   + input file reading: content;
    + output file writing;
 
 TUNEDUP

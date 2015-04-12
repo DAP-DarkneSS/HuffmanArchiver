@@ -24,6 +24,23 @@ Public License along with HuffmanArchiver. If not, see
 #include <stdlib.h>
 #include "huffcode.h"
 
+unsigned int readInBytes
+(
+    size_t BitsCount,
+    FILE *InputFile
+)
+{
+    int TempChar = getc_unlocked (InputFile);
+    unsigned int Number = TempChar;
+    for (size_t i = CHAR_BIT; i < BitsCount; i += CHAR_BIT)
+    {
+        TempChar = getc_unlocked (InputFile);
+        Number <<= CHAR_BIT;
+        Number  += TempChar;
+    }
+    return (Number);
+}
+
 void extract (char InputFileName[], char OutputFileName[])
 {
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
@@ -49,17 +66,14 @@ void extract (char InputFileName[], char OutputFileName[])
             )
         );
         SymbolWeightPtr [SymbolWeightCount].Symbol           = TempChar;
-        TempChar = getc_unlocked (InputFile); // The first weight byte.
-        SymbolWeightPtr [SymbolWeightCount].Weight           = TempChar;
+        SymbolWeightPtr [SymbolWeightCount].Weight           = readInBytes
+        (
+            MaxWeightBits,
+            InputFile
+        );
         SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
         SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
-        for (size_t i = CHAR_BIT; i < MaxWeightBits; i += CHAR_BIT)
-        {
-            TempChar = getc_unlocked (InputFile); // The next weight byte.
-            SymbolWeightPtr [SymbolWeightCount].Weight     <<= CHAR_BIT;
-            SymbolWeightPtr [SymbolWeightCount].Weight      += TempChar;
-        }
         SymbolWeightCount++;
         TempChar = getc_unlocked (InputFile); // The next symbol.
     }
