@@ -51,9 +51,11 @@ void extract (char InputFileName[], char OutputFileName[])
     int SymbolWeightIndex = 0;
     size_t MaxWeightBits = 0;
     int TempBit = 0;
+    size_t SymbolsCount = 0;
 
     InputFile = fopen (InputFileName, "r");
     MaxWeightBits = getc_unlocked (InputFile);
+    SymbolsCount = readInBytes (MaxWeightBits, InputFile);
 
     TempChar = getc_unlocked (InputFile); // The first unique symbol.
     do

@@ -92,6 +92,12 @@ void compress (char InputFileName[], char OutputFileName[])
     }
     OutputFile = fopen (OutputFileName, "w");
     putc_unlocked (MaxWeightBits, OutputFile);
+    writeInBytes
+    (
+        SymbolWeightPtr [SymbolWeightCount - 1].Weight,
+        MaxWeightBits,
+        OutputFile
+    );
     for
     (
         int i = 0;
