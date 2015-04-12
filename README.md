@@ -1,4 +1,4 @@
-[Building status](https://build.opensuse.org/project/show/home:DarkSS) (live master brach), check logs for clang static analyzer & valgrind memcheck output.
+[Building status](https://build.opensuse.org/package/show/home:DarkSS/HuffmanArchiver) (live master brach), check logs for clang static analyzer & valgrind memcheck output.
 
 Development status:
 
@@ -32,6 +32,8 @@ DONE
 TUNEDUP
  * compressing
    + predefined symbols list;
+ * extracting
+   + bitwise operations speed-up;
 
 BUGZONE
  * 

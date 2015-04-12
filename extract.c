@@ -50,7 +50,6 @@ void extract (char InputFileName[], char OutputFileName[])
     int TempChar = EOF;
     int SymbolWeightIndex = 0;
     size_t MaxWeightBits = 0;
-    int TempBit = 0;
     size_t SymbolsCount = 0;
 
     InputFile = fopen (InputFileName, "r");
@@ -94,9 +93,7 @@ void extract (char InputFileName[], char OutputFileName[])
     {
         for (int i = (CHAR_BIT - 1); i >= 0; i--)
         {
-            TempBit = TempChar >> i;
-            TempChar -= (TempBit << i);
-            if (TempBit == 0)
+            if ((TempChar & (1 << i)) == 0)
             {
                 SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
                                     .LeftBranchIndex;
