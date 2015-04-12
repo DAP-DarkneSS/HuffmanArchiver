@@ -43,6 +43,7 @@ void compress (char InputFileName[], char OutputFileName[])
     size_t MaxWeight = 0;
     size_t MaxWeightBits = 0;
     size_t TempWeight = 0;
+    int TheLastSymbolIndex = 0;
 
     for (int i = 0; i < MaxSymbolsCount; i++)
     {
@@ -115,9 +116,10 @@ void compress (char InputFileName[], char OutputFileName[])
                 TempWeight -= (OutputByte << j);
             }
             putc_unlocked (TempWeight, OutputFile);
+            TheLastSymbolIndex = SymbolWeightIndex;
         }
     }
-    putc_unlocked (SymbolWeightPtr [SymbolWeightIndex - 1].Symbol, OutputFile);
+    putc_unlocked (SymbolWeightPtr [TheLastSymbolIndex].Symbol, OutputFile);
 // A HACK to mark the end of characters occurrence statistic ^
 
     InputFile = fopen (InputFileName, "r");
