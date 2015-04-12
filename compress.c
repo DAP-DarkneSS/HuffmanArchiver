@@ -26,12 +26,12 @@ Public License along with HuffmanArchiver. If not, see
 
 void compress (char InputFileName[], char OutputFileName[])
 {
-    const size_t MaxSymbolsCount = 1 << CHAR_BIT;
+    const int MaxSymbolsCount = 1 << CHAR_BIT;
     struct SymbolWeightStruct *SymbolWeightPtr = malloc
     (
         MaxSymbolsCount * 2 * SymbolWeightSingleSize
     );
-    size_t SymbolWeightCount = 0;
+    int SymbolWeightCount = 0;
     FILE *InputFile;
     FILE *OutputFile;
     int TempChar = EOF;
@@ -39,12 +39,12 @@ void compress (char InputFileName[], char OutputFileName[])
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
     int BitsStreamCount = 0;
-    size_t SymbolWeightIndex = 0;
+    int SymbolWeightIndex = 0;
     size_t MaxWeight = 0;
     size_t MaxWeightBits = 0;
     size_t TempWeight = 0;
 
-    for (size_t i = 0; i < MaxSymbolsCount; i++)
+    for (int i = 0; i < MaxSymbolsCount; i++)
     {
         SymbolWeightPtr [i].Symbol           =  i;
         SymbolWeightPtr [i].Weight           =  0;

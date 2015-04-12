@@ -27,7 +27,7 @@ Public License along with HuffmanArchiver. If not, see
 void extract (char InputFileName[], char OutputFileName[])
 {
     struct SymbolWeightStruct *SymbolWeightPtr = malloc (0);
-    size_t SymbolWeightCount = 0;
+    int SymbolWeightCount = 0;
     FILE *InputFile;
     FILE *OutputFile;
     int TempChar = EOF;

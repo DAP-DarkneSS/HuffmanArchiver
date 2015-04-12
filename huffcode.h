@@ -30,8 +30,8 @@ struct SymbolWeightStruct
 static const int SymbolWeightSingleSize =
     sizeof (struct SymbolWeightStruct); /// Core struct size.
 
-size_t makeHuffman
+int makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    size_t SymbolWeightCount
+    int SymbolWeightCount
 ); /// Huffman coding.

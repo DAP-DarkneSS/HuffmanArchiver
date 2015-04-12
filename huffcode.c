@@ -41,10 +41,10 @@ int whereIsParentless
     return (ParentlessIndex);
 }
 
-size_t makeHuffman
+int makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    size_t SymbolWeightCount
+    int SymbolWeightCount
 )
 {
     size_t MinIndex1 = 0;
