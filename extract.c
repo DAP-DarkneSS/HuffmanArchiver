@@ -16,6 +16,9 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
+#define _POSIX_C_SOURCE 200809L
+// ^ HACK vs. warning: implicit declaration of *c_unlocked
+
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdio.h>
 #include <stdlib.h>
