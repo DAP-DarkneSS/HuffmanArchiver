@@ -35,7 +35,6 @@ void compress (char InputFileName[], char OutputFileName[])
     FILE *InputFile;
     FILE *OutputFile;
     int TempChar = EOF;
-    int BitsDataCount = 0;
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
     int BitsStreamCount = 0;
@@ -124,10 +123,12 @@ void compress (char InputFileName[], char OutputFileName[])
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc_unlocked (InputFile)) != EOF)
     {
-        BitsDataCount = SymbolWeightPtr [TempChar].CodeBitsCount;
-        BitsStream = (BitsStream << BitsDataCount) +
-                     SymbolWeightPtr [TempChar].Code;
-        BitsStreamCount += BitsDataCount;
+        BitsStream =
+        (
+            (BitsStream << SymbolWeightPtr [TempChar].CodeBitsCount)
+            + SymbolWeightPtr [TempChar].Code
+        );
+        BitsStreamCount += SymbolWeightPtr [TempChar].CodeBitsCount;
         while (BitsStreamCount >= CHAR_BIT)
         {
             OutputByte = BitsStream >> (BitsStreamCount - CHAR_BIT);
