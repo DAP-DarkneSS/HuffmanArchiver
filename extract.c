@@ -79,7 +79,7 @@ void extract (char InputFileName[], char OutputFileName[])
         for (int i = (CHAR_BIT - 1); i >= 0; i--)
         {
             TempBit = TempChar >> i;
-            TempChar -= (TempBit >> i);
+            TempChar -= (TempBit << i);
             if (TempBit == 0)
             {
                 SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]

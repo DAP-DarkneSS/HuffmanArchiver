@@ -1,3 +1,6 @@
+[Building status](https://build.opensuse.org/project/show/home:DarkSS) (live master brach), check logs for clang static analyzer & valgrind memcheck output.
+
+Development status:
 DONE
  * command line arguments with exit code:
    + 1 ← arguments number is less than 3;
@@ -21,9 +24,9 @@ TUNEDUP
 
 BUGZONE
  * compressing
-   - output file writing: content;
+   - output file writing: bitstream end;
  * extracting
-   - input file reading: content;
+   - input file reading: bitstream end;
 
 NEEDOPTIMIZATION
  * extracting
