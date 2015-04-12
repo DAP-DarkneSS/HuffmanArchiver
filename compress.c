@@ -17,7 +17,6 @@ Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "huffcode.h"
@@ -33,7 +32,6 @@ void compress (char InputFileName[], char OutputFileName[])
     FILE *InputFile;
     FILE *OutputFile;
     int TempChar = EOF;
-    bool UnKnownSymbol = true;
     int BitsDataCount = 0;
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
@@ -43,31 +41,23 @@ void compress (char InputFileName[], char OutputFileName[])
     size_t MaxWeightBits = 0;
     size_t TempWeight = 0;
 
+    for (int i = 0; i < MaxSymbolsCount; i++)
+    {
+        SymbolWeightPtr [i].Symbol           =  i;
+        SymbolWeightPtr [i].Weight           =  0;
+        SymbolWeightPtr [i].LeftBranchIndex  = -1;
+        SymbolWeightPtr [i].RightBranchIndex = -1;
+        SymbolWeightPtr [i].ParentIndex      = -1;
+    }
+
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc_unlocked (InputFile)) != EOF)
     {
-        UnKnownSymbol = true;
-        for (size_t i = 0; (i < SymbolWeightCount) && (UnKnownSymbol); i++)
-        {
-            if (SymbolWeightPtr [i].Symbol == TempChar)
-            {
-                (SymbolWeightPtr [i].Weight)++;
-                UnKnownSymbol = false;
-            }
-        }
-        if (UnKnownSymbol)
-        {
-            SymbolWeightPtr [SymbolWeightCount].Symbol           = TempChar;
-            SymbolWeightPtr [SymbolWeightCount].Weight           = 1;
-            SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = -1;
-            SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
-            SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
-            SymbolWeightCount++;
-        }
+        SymbolWeightPtr [TempChar].Weight++;
     }
     fclose (InputFile);
 
-    SymbolWeightCount = makeHuffman (SymbolWeightPtr, SymbolWeightCount);
+    SymbolWeightCount = makeHuffman (SymbolWeightPtr, MaxSymbolsCount);
 
     for
     (
@@ -103,20 +93,26 @@ void compress (char InputFileName[], char OutputFileName[])
         SymbolWeightIndex++
     )
     {
-        putc_unlocked (SymbolWeightPtr [SymbolWeightIndex].Symbol, OutputFile);
-        TempWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
-        for
-        (
-            size_t j = (MaxWeightBits - CHAR_BIT);
-            j >= CHAR_BIT;
-            j -= CHAR_BIT
-        )
+        if (SymbolWeightPtr [SymbolWeightIndex].Weight != 0)
         {
-            OutputByte = TempWeight >> j;
-            putc_unlocked (OutputByte, OutputFile);
-            TempWeight -= (OutputByte << j);
+            putc_unlocked
+            (
+                SymbolWeightPtr [SymbolWeightIndex].Symbol, OutputFile
+            );
+            TempWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
+            for
+            (
+                size_t j = (MaxWeightBits - CHAR_BIT);
+                j >= CHAR_BIT;
+                j -= CHAR_BIT
+            )
+            {
+                OutputByte = TempWeight >> j;
+                putc_unlocked (OutputByte, OutputFile);
+                TempWeight -= (OutputByte << j);
+            }
+            putc_unlocked (TempWeight, OutputFile);
         }
-        putc_unlocked (TempWeight, OutputFile);
     }
     putc_unlocked (SymbolWeightPtr [SymbolWeightIndex - 1].Symbol, OutputFile);
 // A HACK to mark the end of characters occurrence statistic ^
@@ -124,15 +120,9 @@ void compress (char InputFileName[], char OutputFileName[])
     InputFile = fopen (InputFileName, "r");
     while ((TempChar = getc_unlocked (InputFile)) != EOF)
     {
-        for
-            (
-                SymbolWeightIndex = 0;
-                SymbolWeightPtr [SymbolWeightIndex].Symbol != TempChar;
-                SymbolWeightIndex++
-            ){}
-        BitsDataCount = SymbolWeightPtr [SymbolWeightIndex].CodeBitsCount;
+        BitsDataCount = SymbolWeightPtr [TempChar].CodeBitsCount;
         BitsStream = (BitsStream << BitsDataCount) +
-                     SymbolWeightPtr [SymbolWeightIndex].Code;
+                     SymbolWeightPtr [TempChar].Code;
         BitsStreamCount += BitsDataCount;
         while (BitsStreamCount >= CHAR_BIT)
         {

@@ -29,7 +29,11 @@ int whereIsParentless
     int ParentlessIndex = -1;
     for (int i = MinIndex; (i < MaxIndex) && (ParentlessIndex == -1); i++)
     {
-        if (SymbolWeightPtr [i].ParentIndex == -1)
+        if
+            (
+                (SymbolWeightPtr [i].Weight      !=  0) &&
+                (SymbolWeightPtr [i].ParentIndex == -1)
+            )
         {
             ParentlessIndex = i;
         }
@@ -104,23 +108,30 @@ size_t makeHuffman
 
     for (int i = SymbolWeightCount - 2; i >= 0; i--)
     {
-        if (i == SymbolWeightPtr [
-                SymbolWeightPtr [i].ParentIndex
-            ].LeftBranchIndex)
+        if (SymbolWeightPtr [i].Weight != 0)
         {
-            SymbolWeightPtr [i].Code = (SymbolWeightPtr [
+            if (i == SymbolWeightPtr
+                    [
+                        SymbolWeightPtr [i].ParentIndex
+                    ].LeftBranchIndex)
+            {
+                SymbolWeightPtr [i].Code = SymbolWeightPtr
+                                           [
                 SymbolWeightPtr [i].ParentIndex
-            ].Code << 1) + 0;
+                                           ].Code << 1;
+            }
+            else
+            {
+                SymbolWeightPtr [i].Code = (SymbolWeightPtr
+                                            [
+                SymbolWeightPtr [i].ParentIndex
+                                            ].Code << 1) + 1;
+            }
+            SymbolWeightPtr [i].CodeBitsCount = SymbolWeightPtr
+                                                [
+            SymbolWeightPtr [i].ParentIndex
+                                                ].CodeBitsCount + 1;
         }
-        else
-        {
-            SymbolWeightPtr [i].Code = (SymbolWeightPtr [
-                SymbolWeightPtr [i].ParentIndex
-            ].Code << 1) + 1;
-        }
-        SymbolWeightPtr [i].CodeBitsCount = SymbolWeightPtr [
-                SymbolWeightPtr [i].ParentIndex
-            ].CodeBitsCount + 1;
     }
 
     return (SymbolWeightCount);
