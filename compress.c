@@ -39,7 +39,6 @@ void compress (char InputFileName[], char OutputFileName[])
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
     int BitsStreamCount = 0;
-    int SymbolWeightIndex = 0;
     size_t MaxWeight = 0;
     size_t MaxWeightBits = 0;
     size_t TempWeight = 0;
@@ -65,17 +64,17 @@ void compress (char InputFileName[], char OutputFileName[])
 
     for
     (
-        SymbolWeightIndex = 0;
+        int i = 0;
         (
-            (SymbolWeightIndex < SymbolWeightCount) &&
-            (SymbolWeightPtr [SymbolWeightIndex].Symbol != -1)
+            (i < SymbolWeightCount) &&
+            (SymbolWeightPtr [i].Symbol != -1)
         );
-        SymbolWeightIndex++
+        i++
     )
     {
-        if (SymbolWeightPtr [SymbolWeightIndex].Weight > MaxWeight)
+        if (SymbolWeightPtr [i].Weight > MaxWeight)
         {
-            MaxWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
+            MaxWeight = SymbolWeightPtr [i].Weight;
         }
     }
     for
@@ -92,18 +91,18 @@ void compress (char InputFileName[], char OutputFileName[])
     putc_unlocked (MaxWeightBits, OutputFile);
     for
     (
-        SymbolWeightIndex = 0;
-        SymbolWeightPtr [SymbolWeightIndex].Symbol != -1;
-        SymbolWeightIndex++
+        int i = 0;
+        SymbolWeightPtr [i].Symbol != -1;
+        i++
     )
     {
-        if (SymbolWeightPtr [SymbolWeightIndex].Weight != 0)
+        if (SymbolWeightPtr [i].Weight != 0)
         {
             putc_unlocked
             (
-                SymbolWeightIndex, OutputFile
+                i, OutputFile
             );
-            TempWeight = SymbolWeightPtr [SymbolWeightIndex].Weight;
+            TempWeight = SymbolWeightPtr [i].Weight;
             for
             (
                 size_t j = (MaxWeightBits - CHAR_BIT);
@@ -116,7 +115,7 @@ void compress (char InputFileName[], char OutputFileName[])
                 TempWeight -= (OutputByte << j);
             }
             putc_unlocked (TempWeight, OutputFile);
-            TheLastSymbolIndex = SymbolWeightIndex;
+            TheLastSymbolIndex = i;
         }
     }
     putc_unlocked (TheLastSymbolIndex, OutputFile);
