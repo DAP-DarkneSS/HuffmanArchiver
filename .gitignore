@@ -1,5 +1,12 @@
 *.o
-build/
+build*
 *.kdev4*
 *~
 *.kate-swp
+input*
+*byte*
+callgrind.out.*
+*.ha
+*.re
+*.back
+*.orig

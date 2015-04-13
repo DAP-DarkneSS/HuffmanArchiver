@@ -28,6 +28,9 @@ DONE
      * end of statistic mark;
    + input file reading: content;
    + output file writing;
+ * Makefile (design assignment requirement, cmake is default)
+   + 'all' target
+   + 'clean' target
 
 TUNEDUP
  * compressing
@@ -35,12 +38,6 @@ TUNEDUP
  * extracting
    + bitwise operations speed-up;
 
-BUGZONE
- * 
-
 NEEDOPTIMIZATION
  * extracting
    - 093: if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
-
-TODO
- * Makefile
