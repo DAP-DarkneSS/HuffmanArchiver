@@ -20,9 +20,18 @@ Public License along with HuffmanArchiver. If not, see
 // ^ HACK vs. warning: implicit declaration of *c_unlocked
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "huffcode.h"
+
+struct BytesCacheStruct
+{
+             bool UnCached     [2 << CHAR_BIT];
+             int  Index        [2 << CHAR_BIT];
+    unsigned int  StringLength [2 << CHAR_BIT];
+             int  String       [2 << CHAR_BIT] [CHAR_BIT];
+};
 
 unsigned int readInBytes
 (
@@ -51,6 +60,17 @@ void extract (char InputFileName[], char OutputFileName[])
     int SymbolWeightIndex = 0;
     size_t MaxWeightBits = 0;
     size_t SymbolsCount = 0;
+    struct BytesCacheStruct BytesCache [1 << CHAR_BIT];
+    int IndexCache = 0;
+
+    for (size_t i = 0; i < (1 << CHAR_BIT); i++)
+    {
+        for (size_t j = 0; j < (2 << CHAR_BIT); j++)
+        {
+            BytesCache [i].UnCached     [j] = true;
+            BytesCache [i].StringLength [j] = 0;
+        }
+    }
 
     InputFile = fopen (InputFileName, "r");
     MaxWeightBits = getc_unlocked (InputFile);
@@ -91,31 +111,63 @@ void extract (char InputFileName[], char OutputFileName[])
     OutputFile = fopen (OutputFileName, "w");
     while ((TempChar = getc_unlocked (InputFile)) != EOF) // Bit stream bytes.
     {
-        for (int i = (CHAR_BIT - 1); i >= 0; i--)
+        if (BytesCache [TempChar].UnCached [SymbolWeightIndex])
         {
-            if ((TempChar & (1 << i)) == 0)
+            IndexCache = SymbolWeightIndex;
+            for (int i = (CHAR_BIT - 1); i >= 0; i--)
             {
-                SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
-                                    .LeftBranchIndex;
+                if ((TempChar & (1 << i)) == 0)
+                {
+                    SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                        .LeftBranchIndex;
+                }
+                else
+                {
+                    SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                        .RightBranchIndex;
+                }
+                if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+                {
+                    if (SymbolsCount > 0)
+                    {
+                        BytesCache [TempChar].String [IndexCache] [
+                            BytesCache [TempChar].StringLength [IndexCache]
+                        ] = SymbolWeightPtr [SymbolWeightIndex].Symbol;
+                        BytesCache [TempChar].StringLength [IndexCache]++;
+                        putc_unlocked
+                        (
+                            SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                            OutputFile
+                        );
+                        SymbolsCount--;
+                    }
+                    SymbolWeightIndex = SymbolWeightCount - 1;
+                }
             }
-            else
-            {
-                SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
-                                    .RightBranchIndex;
-            }
-            if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+            BytesCache [TempChar].Index    [IndexCache] = SymbolWeightIndex;
+            BytesCache [TempChar].UnCached [IndexCache] = false;
+        }
+        else
+        {
+            for
+            (
+                size_t i = 0;
+                i < BytesCache [TempChar].StringLength [SymbolWeightIndex];
+                i++
+            )
             {
                 if (SymbolsCount > 0)
                 {
                     putc_unlocked
                     (
-                        SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                        BytesCache [TempChar].String [SymbolWeightIndex] [i],
                         OutputFile
                     );
                     SymbolsCount--;
                 }
-                SymbolWeightIndex = SymbolWeightCount - 1;
             }
+
+            SymbolWeightIndex = BytesCache [TempChar].Index [SymbolWeightIndex];
         }
     }
 
