@@ -81,6 +81,10 @@ int main (int argc, char * argv[])
                     extract (argv [1], argv [3]);
                 }
             }
+            else
+            {
+                printf ("Try `%s --help`.\n", argv [0]);
+            }
         }
     }
     return (ExitCode);
