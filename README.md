@@ -36,8 +36,12 @@ TUNEDUP
  * compressing
    + predefined symbols list;
  * extracting
+   + bytes cache;
    + bitwise operations speed-up;
+ * I/O speed-up
+   + unlocked std I/O;
+   + fgetc → fread (~2 KByte);
 
 NEEDOPTIMIZATION
- * extracting
-   - 093: if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+ * I/O
+   + fputc → fwrite;

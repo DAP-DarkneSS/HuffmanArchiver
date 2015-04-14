@@ -16,8 +16,8 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-#define _POSIX_C_SOURCE 200809L
-// ^ HACK vs. warning: implicit declaration of *c_unlocked
+#define _BSD_SOURCE
+// ^ HACK vs. warning: implicit declaration of *_unlocked
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdio.h>
@@ -56,12 +56,13 @@ void compress (char InputFileName[], char OutputFileName[])
     int SymbolWeightCount = 0;
     FILE *InputFile;
     FILE *OutputFile;
-    int TempChar = EOF;
     unsigned long int BitsStream = 0;
     int OutputByte = 0;
     int BitsStreamCount = 0;
     size_t MaxWeightBits = 0;
     int TheLastSymbolIndex = 0;
+    unsigned char InputCache [IO_BYTES];
+    size_t InputCacheCount;
 
     for (int i = 0; i < MaxSymbolsCount; i++)
     {
@@ -72,10 +73,21 @@ void compress (char InputFileName[], char OutputFileName[])
         SymbolWeightPtr [i].ParentIndex      = -1;
     }
 
-    InputFile = fopen (InputFileName, "r");
-    while ((TempChar = getc_unlocked (InputFile)) != EOF)
+    InputFile = fopen (InputFileName, "rb");
+    while
+    (
+        (
+            InputCacheCount = fread_unlocked
+            (
+                InputCache, 1, IO_BYTES, InputFile
+            )
+        ) > 0
+    )
     {
-        SymbolWeightPtr [TempChar].Weight++;
+        for (size_t i = 0; i < InputCacheCount; i++)
+        {
+            SymbolWeightPtr [InputCache[i]].Weight++;
+        }
     }
     fclose (InputFile);
 
@@ -123,22 +135,33 @@ void compress (char InputFileName[], char OutputFileName[])
     putc_unlocked (TheLastSymbolIndex, OutputFile);
 // A HACK to mark the end of characters occurrence statistic ^
 
-    InputFile = fopen (InputFileName, "r");
-    while ((TempChar = getc_unlocked (InputFile)) != EOF)
-    {
-        BitsStream =
+    InputFile = fopen (InputFileName, "rb");
+    while
+    (
         (
-            (BitsStream << SymbolWeightPtr [TempChar].CodeBitsCount)
-            + SymbolWeightPtr [TempChar].Code
-        );
-        BitsStreamCount += SymbolWeightPtr [TempChar].CodeBitsCount;
-        while (BitsStreamCount >= CHAR_BIT)
+            InputCacheCount = fread_unlocked
+            (
+                InputCache, 1, IO_BYTES, InputFile
+            )
+        ) > 0
+    )
+    {
+        for (size_t i = 0; i < InputCacheCount; i++)
         {
-            OutputByte = BitsStream >> (BitsStreamCount - CHAR_BIT);
-            BitsStream -= ((unsigned long int) OutputByte) <<
-                          (BitsStreamCount - CHAR_BIT);
-            BitsStreamCount -= CHAR_BIT;
-            putc_unlocked (OutputByte, OutputFile);
+            BitsStream =
+                (
+                    (BitsStream << SymbolWeightPtr [InputCache[i]].CodeBitsCount)
+                    + SymbolWeightPtr [InputCache[i]].Code
+                );
+            BitsStreamCount += SymbolWeightPtr [InputCache[i]].CodeBitsCount;
+            while (BitsStreamCount >= CHAR_BIT)
+            {
+                OutputByte = BitsStream >> (BitsStreamCount - CHAR_BIT);
+                BitsStream -= ((unsigned long int) OutputByte) <<
+                              (BitsStreamCount - CHAR_BIT);
+                BitsStreamCount -= CHAR_BIT;
+                putc_unlocked (OutputByte, OutputFile);
+            }
         }
     }
     fclose (InputFile);

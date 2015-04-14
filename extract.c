@@ -16,8 +16,8 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-#define _POSIX_C_SOURCE 200809L
-// ^ HACK vs. warning: implicit declaration of *c_unlocked
+#define _BSD_SOURCE
+// ^ HACK vs. warning: implicit declaration of *_unlocked
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdbool.h>
@@ -62,6 +62,8 @@ void extract (char InputFileName[], char OutputFileName[])
     size_t SymbolsCount = 0;
     struct BytesCacheStruct BytesCache [1 << CHAR_BIT];
     int IndexCache = 0;
+    unsigned char InputCache [IO_BYTES];
+    size_t InputCacheCount;
 
     for (size_t i = 0; i < (1 << CHAR_BIT); i++)
     {
@@ -72,7 +74,7 @@ void extract (char InputFileName[], char OutputFileName[])
         }
     }
 
-    InputFile = fopen (InputFileName, "r");
+    InputFile = fopen (InputFileName, "rb");
     MaxWeightBits = getc_unlocked (InputFile);
     SymbolsCount = readInBytes (MaxWeightBits, InputFile);
 
@@ -109,65 +111,81 @@ void extract (char InputFileName[], char OutputFileName[])
 
     SymbolWeightIndex = SymbolWeightCount - 1;
     OutputFile = fopen (OutputFileName, "w");
-    while ((TempChar = getc_unlocked (InputFile)) != EOF) // Bit stream bytes.
+    while
+    (
+        (
+            InputCacheCount = fread_unlocked
+            (
+                InputCache, 1, IO_BYTES, InputFile
+            )
+        ) > 0
+    )
     {
-        if (BytesCache [TempChar].UnCached [SymbolWeightIndex])
+        for (size_t j = 0; j < InputCacheCount; j++)
         {
-            IndexCache = SymbolWeightIndex;
-            for (int i = (CHAR_BIT - 1); i >= 0; i--)
+            if (BytesCache [InputCache[j]].UnCached [SymbolWeightIndex])
             {
-                if ((TempChar & (1 << i)) == 0)
+                IndexCache = SymbolWeightIndex;
+                for (int i = (CHAR_BIT - 1); i >= 0; i--)
                 {
-                    SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
-                                        .LeftBranchIndex;
+                    if ((InputCache[j] & (1 << i)) == 0)
+                    {
+                        SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                            .LeftBranchIndex;
+                    }
+                    else
+                    {
+                        SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
+                                            .RightBranchIndex;
+                    }
+                    if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+                    {
+                        if (SymbolsCount > 0)
+                        {
+                            BytesCache [InputCache[j]].String [IndexCache] [
+                                BytesCache [InputCache[j]]
+                                           .StringLength [IndexCache]
+                            ] = SymbolWeightPtr [SymbolWeightIndex].Symbol;
+                            BytesCache [InputCache[j]]
+                                       .StringLength [IndexCache]++;
+                            putc_unlocked
+                            (
+                                SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                                OutputFile
+                            );
+                            SymbolsCount--;
+                        }
+                        SymbolWeightIndex = SymbolWeightCount - 1;
+                    }
                 }
-                else
-                {
-                    SymbolWeightIndex = SymbolWeightPtr [SymbolWeightIndex]
-                                        .RightBranchIndex;
-                }
-                if (SymbolWeightPtr [SymbolWeightIndex].LeftBranchIndex == -1)
+                BytesCache [InputCache[j]].Index [IndexCache] = SymbolWeightIndex;
+                BytesCache [InputCache[j]].UnCached [IndexCache] = false;
+            }
+            else
+            {
+                for
+                (
+                    size_t i = 0;
+                    i < BytesCache [InputCache[j]]
+                                   .StringLength [SymbolWeightIndex];
+                    i++
+                )
                 {
                     if (SymbolsCount > 0)
                     {
-                        BytesCache [TempChar].String [IndexCache] [
-                            BytesCache [TempChar].StringLength [IndexCache]
-                        ] = SymbolWeightPtr [SymbolWeightIndex].Symbol;
-                        BytesCache [TempChar].StringLength [IndexCache]++;
                         putc_unlocked
                         (
-                            SymbolWeightPtr [SymbolWeightIndex].Symbol,
+                            BytesCache [InputCache[j]]
+                                       .String [SymbolWeightIndex] [i],
                             OutputFile
                         );
                         SymbolsCount--;
                     }
-                    SymbolWeightIndex = SymbolWeightCount - 1;
                 }
-            }
-            BytesCache [TempChar].Index    [IndexCache] = SymbolWeightIndex;
-            BytesCache [TempChar].UnCached [IndexCache] = false;
-        }
-        else
-        {
-            for
-            (
-                size_t i = 0;
-                i < BytesCache [TempChar].StringLength [SymbolWeightIndex];
-                i++
-            )
-            {
-                if (SymbolsCount > 0)
-                {
-                    putc_unlocked
-                    (
-                        BytesCache [TempChar].String [SymbolWeightIndex] [i],
-                        OutputFile
-                    );
-                    SymbolsCount--;
-                }
-            }
 
-            SymbolWeightIndex = BytesCache [TempChar].Index [SymbolWeightIndex];
+                SymbolWeightIndex = BytesCache [InputCache[j]]
+                                               .Index [SymbolWeightIndex];
+            }
         }
     }
 

@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
+#define IO_BYTES (1 << 13)
+
 struct SymbolWeightStruct
 {
              int Symbol;
