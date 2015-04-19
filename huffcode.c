@@ -47,90 +47,115 @@ int makeHuffman
     int SymbolWeightCount
 )
 {
-    size_t MinIndex1 = 0;
+    size_t MinIndex1 = whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount);
     size_t MinIndex2 = 0;
     int MinIndexCandidate = -1;
 
-    while
-    (
-        ((MinIndexCandidate =
-        whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount))
-        != (SymbolWeightCount - 1)) && (MinIndexCandidate != -1)
-    )
-    {
-        MinIndex1 = MinIndexCandidate;
-        MinIndex2 = whereIsParentless
-                    (SymbolWeightPtr, (MinIndex1 + 1), SymbolWeightCount);
-        for
+    if ((whereIsParentless
         (
-            MinIndexCandidate = whereIsParentless
-            (
-                SymbolWeightPtr, (MinIndex2 + 1), SymbolWeightCount
-            );
-            MinIndexCandidate != -1;
-            MinIndexCandidate = whereIsParentless
-            (
-                SymbolWeightPtr, (MinIndexCandidate + 1), SymbolWeightCount
-            )
-        )
-        {
-            if
-            (
-                SymbolWeightPtr [MinIndexCandidate].Weight <
-                SymbolWeightPtr [MinIndex2].Weight
-            )
-            {
-                MinIndex2 = MinIndexCandidate;
-            }
-            else if
-            (
-                SymbolWeightPtr [MinIndexCandidate].Weight <
-                SymbolWeightPtr [MinIndex1].Weight
-            )
-            {
-                MinIndex1 = MinIndex2;
-                MinIndex2 = MinIndexCandidate;
-            }
-        }
+            SymbolWeightPtr,
+            (MinIndex1 + 1),
+            SymbolWeightCount
+        )) == -1)
+    {
+        SymbolWeightPtr [MinIndex1].Code                     = 0;
+        SymbolWeightPtr [MinIndex1].CodeBitsCount            = 1;
+
         SymbolWeightPtr [SymbolWeightCount].Symbol           = -1;
         SymbolWeightPtr [SymbolWeightCount].Weight           =
-            SymbolWeightPtr [MinIndex1].Weight +
-            SymbolWeightPtr [MinIndex2].Weight;
-        SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = MinIndex1;
-        SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex2;
+                SymbolWeightPtr [MinIndex1].Weight;
+        SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  =
+        SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex1;
         SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
         SymbolWeightPtr [SymbolWeightCount].Code             = 0;
         SymbolWeightPtr [SymbolWeightCount].CodeBitsCount    = 0;
-        SymbolWeightPtr [MinIndex1].ParentIndex =
-        SymbolWeightPtr [MinIndex2].ParentIndex = SymbolWeightCount;
         SymbolWeightCount++;
     }
-
-    for (int i = SymbolWeightCount - 2; i >= 0; i--)
+    else
     {
-        if (SymbolWeightPtr [i].Weight != 0)
+        while
+        (
+            ((MinIndexCandidate =
+                  whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount))
+             != (SymbolWeightCount - 1)) && (MinIndexCandidate != -1)
+        )
         {
-            if (i == SymbolWeightPtr
+            MinIndex1 = MinIndexCandidate;
+            MinIndex2 = whereIsParentless
+                        (SymbolWeightPtr, (MinIndex1 + 1), SymbolWeightCount);
+            for
+            (
+                MinIndexCandidate = whereIsParentless
+                                    (
+                                        SymbolWeightPtr, (MinIndex2 + 1),
+                                        SymbolWeightCount
+                                    );
+                MinIndexCandidate != -1;
+                MinIndexCandidate = whereIsParentless
+                                    (
+                                        SymbolWeightPtr, (MinIndexCandidate + 1),
+                                        SymbolWeightCount
+                                    )
+            )
+            {
+                if
+                (
+                    SymbolWeightPtr [MinIndexCandidate].Weight <
+                    SymbolWeightPtr [MinIndex2].Weight
+                )
+                {
+                    MinIndex2 = MinIndexCandidate;
+                }
+                else if
+                (
+                    SymbolWeightPtr [MinIndexCandidate].Weight <
+                    SymbolWeightPtr [MinIndex1].Weight
+                )
+                {
+                    MinIndex1 = MinIndex2;
+                    MinIndex2 = MinIndexCandidate;
+                }
+            }
+            SymbolWeightPtr [SymbolWeightCount].Symbol           = -1;
+            SymbolWeightPtr [SymbolWeightCount].Weight           =
+                SymbolWeightPtr [MinIndex1].Weight +
+                SymbolWeightPtr [MinIndex2].Weight;
+            SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  = MinIndex1;
+            SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = MinIndex2;
+            SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+            SymbolWeightPtr [SymbolWeightCount].Code             = 0;
+            SymbolWeightPtr [SymbolWeightCount].CodeBitsCount    = 0;
+            SymbolWeightPtr [MinIndex1].ParentIndex =
+                SymbolWeightPtr [MinIndex2].ParentIndex = SymbolWeightCount;
+            SymbolWeightCount++;
+        }
+
+        for (int i = SymbolWeightCount - 2; i >= 0; i--)
+        {
+            if (SymbolWeightPtr [i].Weight != 0)
+            {
+                if (i == SymbolWeightPtr
+                        [
+                            SymbolWeightPtr [i].ParentIndex
+                        ].LeftBranchIndex)
+                {
+                    SymbolWeightPtr [i].Code = SymbolWeightPtr
                     [
                         SymbolWeightPtr [i].ParentIndex
-                    ].LeftBranchIndex)
-            {
-                SymbolWeightPtr [i].Code = SymbolWeightPtr
-                                           [
-                SymbolWeightPtr [i].ParentIndex
-                                           ].Code << 1;
+                    ].Code << 1;
+                }
+                else
+                {
+                    SymbolWeightPtr [i].Code = (SymbolWeightPtr
+                    [
+                        SymbolWeightPtr [i].ParentIndex
+                    ].Code << 1) + 1;
+                }
+                SymbolWeightPtr [i].CodeBitsCount = SymbolWeightPtr
+                    [
+                        SymbolWeightPtr [i].ParentIndex
+                    ].CodeBitsCount + 1;
             }
-            else
-            {
-                SymbolWeightPtr [i].Code = (SymbolWeightPtr
-                                            [
-                SymbolWeightPtr [i].ParentIndex
-                                            ].Code << 1) + 1;
-            }
-            SymbolWeightPtr [i].CodeBitsCount = SymbolWeightPtr
-                                                [
-            SymbolWeightPtr [i].ParentIndex
-                                                ].CodeBitsCount + 1;
         }
     }
 
