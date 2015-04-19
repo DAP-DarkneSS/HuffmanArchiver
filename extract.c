@@ -16,8 +16,8 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-#define _BSD_SOURCE
-// ^ HACK vs. warning: implicit declaration of *_unlocked
+#define _DEFAULT_SOURCE
+// ^ HACK vs. warning: implicit declaration of *_unlocked.
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
 #include <stdbool.h>

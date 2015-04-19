@@ -40,7 +40,7 @@ TUNEDUP
    + bitwise operations speed-up;
  * I/O speed-up
    + unlocked std I/O;
-   + fgetc → fread (~2 KByte);
+   + fgetc → fread (~ kByte);
 
 NEEDOPTIMIZATION
  * I/O
