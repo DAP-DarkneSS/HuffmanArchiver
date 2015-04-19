@@ -102,6 +102,10 @@ void compress (char InputFileName[], char OutputFileName[])
     {
         MaxWeightBits += CHAR_BIT;
     }
+    if (MaxWeightBits == 0)
+    {
+        MaxWeightBits = 8; // Zero file HACK.
+    }
     OutputFile = fopen (OutputFileName, "w");
     putc_unlocked (MaxWeightBits, OutputFile);
     writeInBytes

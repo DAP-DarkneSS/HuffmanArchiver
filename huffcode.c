@@ -47,11 +47,22 @@ int makeHuffman
     int SymbolWeightCount
 )
 {
-    size_t MinIndex1 = whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount);
-    size_t MinIndex2 = 0;
+    int MinIndex1 = whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount);
+    int MinIndex2 = 0;
     int MinIndexCandidate = -1;
 
-    if ((whereIsParentless
+    if (MinIndex1 == -1)
+    {
+        SymbolWeightPtr [SymbolWeightCount].Symbol           = -1;
+        SymbolWeightPtr [SymbolWeightCount].Weight           = 0;
+        SymbolWeightPtr [SymbolWeightCount].LeftBranchIndex  =
+        SymbolWeightPtr [SymbolWeightCount].RightBranchIndex = -1;
+        SymbolWeightPtr [SymbolWeightCount].ParentIndex      = -1;
+        SymbolWeightPtr [SymbolWeightCount].Code             = 0;
+        SymbolWeightPtr [SymbolWeightCount].CodeBitsCount    = 0;
+        SymbolWeightCount++;
+    }
+    else if ((whereIsParentless
         (
             SymbolWeightPtr,
             (MinIndex1 + 1),
