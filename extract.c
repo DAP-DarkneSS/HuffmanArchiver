@@ -20,6 +20,8 @@ Public License along with HuffmanArchiver. If not, see
 // ^ HACK vs. warning: implicit declaration of *_unlocked.
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
+#include <stdint.h> // error: unknown type name ‘int_fast32_t’
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,21 +29,22 @@ Public License along with HuffmanArchiver. If not, see
 
 struct BytesCacheStruct
 {
-             bool UnCached     [2 << CHAR_BIT];
-             int  Index        [2 << CHAR_BIT];
-    unsigned int  StringLength [2 << CHAR_BIT];
-             int  String       [2 << CHAR_BIT] [CHAR_BIT];
+    bool          UnCached     [2 << CHAR_BIT];
+    int_fast32_t  Index        [2 << CHAR_BIT];
+    uint_fast32_t StringLength [2 << CHAR_BIT];
+    int32_t       String       [2 << CHAR_BIT] [CHAR_BIT];
+// 64-bit should be faster but it segfaults.
 };
 
 unsigned int readInBytes
 (
-    size_t BitsCount,
+    uint_fast32_t BitsCount,
     FILE *InputFile
 )
 {
     int TempChar = getc_unlocked (InputFile);
     unsigned int Number = TempChar;
-    for (size_t i = CHAR_BIT; i < BitsCount; i += CHAR_BIT)
+    for (uint_fast32_t i = CHAR_BIT; i < BitsCount; i += CHAR_BIT)
     {
         TempChar = getc_unlocked (InputFile);
         Number <<= CHAR_BIT;
@@ -58,16 +61,16 @@ void extract (char InputFileName[], char OutputFileName[])
     FILE *OutputFile;
     int TempChar = EOF;
     int SymbolWeightIndex = 0;
-    size_t MaxWeightBits = 0;
-    size_t SymbolsCount = 0;
+    uint_fast32_t MaxWeightBits = 0;
+    uint_fast32_t SymbolsCount = 0;
     struct BytesCacheStruct BytesCache [1 << CHAR_BIT];
     int IndexCache = 0;
     unsigned char InputCache [IO_BYTES];
-    size_t InputCacheCount;
+    uint_fast32_t InputCacheCount;
 
-    for (size_t i = 0; i < (1 << CHAR_BIT); i++)
+    for (uint_fast32_t i = 0; i < (1 << CHAR_BIT); i++)
     {
-        for (size_t j = 0; j < (2 << CHAR_BIT); j++)
+        for (uint_fast32_t j = 0; j < (2 << CHAR_BIT); j++)
         {
             BytesCache [i].UnCached     [j] = true;
             BytesCache [i].StringLength [j] = 0;
@@ -121,7 +124,7 @@ void extract (char InputFileName[], char OutputFileName[])
         ) > 0
     )
     {
-        for (size_t j = 0; j < InputCacheCount; j++)
+        for (uint_fast32_t j = 0; j < InputCacheCount; j++)
         {
             if (BytesCache [InputCache[j]].UnCached [SymbolWeightIndex])
             {
@@ -165,7 +168,7 @@ void extract (char InputFileName[], char OutputFileName[])
             {
                 for
                 (
-                    size_t i = 0;
+                    uint_fast32_t i = 0;
                     i < BytesCache [InputCache[j]]
                                    .StringLength [SymbolWeightIndex];
                     i++

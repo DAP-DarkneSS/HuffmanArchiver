@@ -18,22 +18,24 @@ Public License along with HuffmanArchiver. If not, see
 
 #define IO_BYTES (1 << 13)
 
+#include <stdint.h> // error: ‘int_fast32_t’ undeclared
+
 struct SymbolWeightStruct
 {
-             int Symbol;
-    unsigned int Weight;
-             int LeftBranchIndex;
-             int RightBranchIndex;
-             int ParentIndex;
-    unsigned int Code;
-    unsigned int CodeBitsCount;
+    int_fast32_t  Symbol;
+    uint_fast32_t Weight;
+    int_fast32_t  LeftBranchIndex;
+    int_fast32_t  RightBranchIndex;
+    int_fast32_t  ParentIndex;
+    uint_fast32_t Code;
+    uint_fast32_t CodeBitsCount;
 }; /// Core struct for this implementation.
 
-static const int SymbolWeightSingleSize =
+static const int_fast32_t SymbolWeightSingleSize =
     sizeof (struct SymbolWeightStruct); /// Core struct size.
 
-int makeHuffman
+int_fast32_t makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    int SymbolWeightCount
+    int_fast32_t SymbolWeightCount
 ); /// Huffman coding.

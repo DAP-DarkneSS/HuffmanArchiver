@@ -16,18 +16,23 @@ You should have received a copy of the GNU Lesser General
 Public License along with HuffmanArchiver. If not, see
 <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html> */
 
-#include <stddef.h> // error: unknown type name ‘size_t’
+#include <stddef.h> // error: unknown type name ‘uint_fast32_t’
 #include "huffcode.h"
 
-int whereIsParentless
+int_fast32_t whereIsParentless
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    int MinIndex,
-    int MaxIndex
+    int_fast32_t MinIndex,
+    int_fast32_t MaxIndex
 )
 {
-    int ParentlessIndex = -1;
-    for (int i = MinIndex; (i < MaxIndex) && (ParentlessIndex == -1); i++)
+    int_fast32_t ParentlessIndex = -1;
+    for
+        (
+            int_fast32_t i = MinIndex;
+            (i < MaxIndex) && (ParentlessIndex == -1);
+            i++
+        )
     {
         if
             (
@@ -41,15 +46,25 @@ int whereIsParentless
     return (ParentlessIndex);
 }
 
-int makeHuffman
+int_fast32_t makeHuffman
 (
     struct SymbolWeightStruct *SymbolWeightPtr,
-    int SymbolWeightCount
+    int_fast32_t SymbolWeightCount
 )
 {
-    int MinIndex1 = whereIsParentless (SymbolWeightPtr, 0, SymbolWeightCount);
-    int MinIndex2 = 0;
-    int MinIndexCandidate = -1;
+    int_fast32_t MinIndex1 = whereIsParentless
+    (
+        SymbolWeightPtr,
+        0,
+        SymbolWeightCount
+    );
+    int_fast32_t MinIndex2 = whereIsParentless
+    (
+        SymbolWeightPtr,
+        (MinIndex1 + 1),
+        SymbolWeightCount
+    );
+    int_fast32_t MinIndexCandidate = -1;
 
     if (MinIndex1 == -1)
     {
@@ -62,12 +77,7 @@ int makeHuffman
         SymbolWeightPtr [SymbolWeightCount].CodeBitsCount    = 0;
         SymbolWeightCount++;
     }
-    else if ((whereIsParentless
-        (
-            SymbolWeightPtr,
-            (MinIndex1 + 1),
-            SymbolWeightCount
-        )) == -1)
+    else if (MinIndex2 == -1)
     {
         SymbolWeightPtr [MinIndex1].Code                     = 0;
         SymbolWeightPtr [MinIndex1].CodeBitsCount            = 1;
@@ -141,7 +151,7 @@ int makeHuffman
             SymbolWeightCount++;
         }
 
-        for (int i = SymbolWeightCount - 2; i >= 0; i--)
+        for (int_fast32_t i = SymbolWeightCount - 2; i >= 0; i--)
         {
             if (SymbolWeightPtr [i].Weight != 0)
             {

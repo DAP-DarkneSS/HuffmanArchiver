@@ -41,6 +41,7 @@ TUNEDUP
  * I/O speed-up
    + unlocked std I/O;
    + fgetc → fread (~ kByte);
+ * architecture-bit numbers.
 
 NEEDOPTIMIZATION
  * I/O

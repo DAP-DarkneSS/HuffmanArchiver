@@ -20,21 +20,22 @@ Public License along with HuffmanArchiver. If not, see
 // ^ HACK vs. warning: implicit declaration of *_unlocked.
 
 #include <limits.h> // error: ‘CHAR_BIT’ undeclared
+#include <stdint.h> // error: ‘uint64_t’ undeclared
 #include <stdio.h>
 #include <stdlib.h>
 #include "huffcode.h"
 
 void writeInBytes
 (
-    unsigned int Number,
-    size_t BitsCount,
+    uint_fast32_t Number,
+    uint_fast32_t BitsCount,
     FILE *OutputFile
 )
 {
-    int OutputByte = 0;
+    int_fast32_t OutputByte = 0;
     for
     (
-        size_t i = (BitsCount - CHAR_BIT);
+        uint_fast32_t i = (BitsCount - CHAR_BIT);
         i >= CHAR_BIT;
         i -= CHAR_BIT
     )
@@ -48,23 +49,24 @@ void writeInBytes
 
 void compress (char InputFileName[], char OutputFileName[])
 {
-    const int MaxSymbolsCount = 1 << CHAR_BIT;
+    const int_fast32_t MaxSymbolsCount = 1 << CHAR_BIT;
     struct SymbolWeightStruct *SymbolWeightPtr = malloc
     (
         MaxSymbolsCount * 2 * SymbolWeightSingleSize
     );
-    int SymbolWeightCount = 0;
+    int_fast32_t SymbolWeightCount = 0;
     FILE *InputFile;
     FILE *OutputFile;
-    unsigned long int BitsStream = 0;
-    int OutputByte = 0;
-    int BitsStreamCount = 0;
-    size_t MaxWeightBits = 0;
-    int TheLastSymbolIndex = 0;
+    uint_fast64_t BitsStream = 0;
+// Not uint_fast32_t to not be overflowed at 32-bit PC.
+    int_fast32_t OutputByte = 0;
+    int_fast32_t BitsStreamCount = 0;
+    uint_fast32_t MaxWeightBits = 0;
+    int_fast32_t TheLastSymbolIndex = 0;
     unsigned char InputCache [IO_BYTES];
-    size_t InputCacheCount;
+    uint_fast32_t InputCacheCount;
 
-    for (int i = 0; i < MaxSymbolsCount; i++)
+    for (int_fast32_t i = 0; i < MaxSymbolsCount; i++)
     {
         SymbolWeightPtr [i].Symbol           =  i;
         SymbolWeightPtr [i].Weight           =  0;
@@ -84,7 +86,7 @@ void compress (char InputFileName[], char OutputFileName[])
         ) > 0
     )
     {
-        for (size_t i = 0; i < InputCacheCount; i++)
+        for (uint_fast32_t i = 0; i < InputCacheCount; i++)
         {
             SymbolWeightPtr [InputCache[i]].Weight++;
         }
@@ -95,7 +97,7 @@ void compress (char InputFileName[], char OutputFileName[])
 
     for
     (
-        size_t i = SymbolWeightPtr [SymbolWeightCount - 1].Weight;
+        uint_fast32_t i = SymbolWeightPtr [SymbolWeightCount - 1].Weight;
         i > 0;
         i >>= CHAR_BIT
     )
@@ -116,7 +118,7 @@ void compress (char InputFileName[], char OutputFileName[])
     );
     for
     (
-        int i = 0;
+        int_fast32_t i = 0;
         SymbolWeightPtr [i].Symbol != -1;
         i++
     )
@@ -150,7 +152,7 @@ void compress (char InputFileName[], char OutputFileName[])
         ) > 0
     )
     {
-        for (size_t i = 0; i < InputCacheCount; i++)
+        for (uint_fast32_t i = 0; i < InputCacheCount; i++)
         {
             BitsStream =
                 (
@@ -161,7 +163,7 @@ void compress (char InputFileName[], char OutputFileName[])
             while (BitsStreamCount >= CHAR_BIT)
             {
                 OutputByte = BitsStream >> (BitsStreamCount - CHAR_BIT);
-                BitsStream -= ((unsigned long int) OutputByte) <<
+                BitsStream -= ((uint_fast64_t) OutputByte) <<
                               (BitsStreamCount - CHAR_BIT);
                 BitsStreamCount -= CHAR_BIT;
                 putc_unlocked (OutputByte, OutputFile);
