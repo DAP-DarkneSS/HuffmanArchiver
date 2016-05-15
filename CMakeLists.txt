@@ -10,4 +10,13 @@ add_executable (huffar
     main.c
 )
 
-install(TARGETS huffar DESTINATION ${CMAKE_INSTALL_PREFIX}/bin COMPONENT binaries)
+install(
+    TARGETS huffar
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+    COMPONENT binaries
+)
+
+install(
+    FILES ${CMAKE_CURRENT_SOURCE_DIR}/huffar.1
+    DESTINATION ${SHARE_INSTALL_PREFIX}/man/man1
+    COMPONENT doc)
